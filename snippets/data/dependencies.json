@@ -6,7 +6,7 @@
     "scripts": [
         "https://cdn.jsdelivr.net/jquery/2.2.4/jquery.min.js",
         "https://cdn.jsdelivr.net/jquery.ui/1.11.4/jquery-ui.min.js",
-        "https://cdn.jsdelivr.net/clipboard.js/1.5.12/clipboard.min.js",
+        "https://cdn.jsdelivr.net/clipboard.js/1.5.15/clipboard.min.js",
         "https://cdn.jsdelivr.net/ace/1.2.4/min/ace.js",
         "https://cdn.jsdelivr.net/ace/1.2.4/min/ext-language_tools.js",
         "https://cdn.jsdelivr.net/bootstrap/3.3.7/js/bootstrap.min.js"

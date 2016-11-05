@@ -916,6 +916,7 @@ document.onload = function(){
         clipboardCopyUrl = new Clipboard("#uglify-url-copy", {
             text: function(trigger) {
                 storeInHash();
+                return location.toString();
             }
         });
     } else {
