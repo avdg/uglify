@@ -27,7 +27,8 @@ module.exports = function(grunt) {
         postBuild: {
             options: {
                 removeComments: true,
-                collapseWhitespace: true
+                collapseWhitespace: true,
+                maxLineLength: 32000
             },
             src: 'build/html/index.html',
             dest: 'docs/index.html'
