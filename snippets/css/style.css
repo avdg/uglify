@@ -1,0 +1,21 @@
+@media (min-width: 992px) {
+    #uglify-options div {
+        max-height: 200px;
+        overflow: auto;
+    }
+}
+#editor, #output {
+    height: 400px;
+}
+#uglify-reset-settings-cancel {
+    display: none;
+}
+#uglify-checkout-status a {
+    color: inherit;
+}
+.dropdown-with-updates .caret {
+    color: #D6C1DD;
+}
+.ace_editor {
+    border-radius: 10px;
+}

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:;base64,iVBORw0KGgo=">
+{{#each dependencies.stylesheets}}
+<link rel="stylesheet" href="{{href}}" integrity="{{integrity}}" crossorigin="anonymous">
+{{/each}}
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Uglify compressor</title>
+<style>
+{{css}}
+</style>
+</head>
+<body>
+{{editor}}
+{{#each dependencies.scripts}}
+<script src="{{href}}" integrity="{{integrity}}" crossorigin="anonymous"></script>
+{{/each}}
+<script>
+{{js}}
+</script>
+</body>
+</html>

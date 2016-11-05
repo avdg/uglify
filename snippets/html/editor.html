@@ -1,0 +1,140 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+            <form onsubmit="return false">
+                <div class="input-group" id="uglify-statusbar">
+                    <span class="input-group-addon" id="uglify-checkout-status">Loading...</span>
+                    <input type="text" class="form-control" id="uglify-checkout-version" placeholder="(ref:) 572b97b master harmony v2.7.3 (pull request:) PR1234 #1234">
+                    <div class="input-group-btn" id="uglify-version-change-group">
+                        <button class="btn btn-default" type="submit" id="uglify-version-change">Change version</button>
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="uglify-version-change-dropdown">
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-right">
+                            <li><a href="https://www.github.com/mishoo/UglifyJS2" target="_blank">Go to project page &#x1f517;</a></li>
+                            <li><a id="uglify-show-intro">Show help shown at intro</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a id="uglify-update-refresh">Refresh version cache</a></li>
+                            <li><a id="uglify-update-info"><em id="uglify-update-state">No refs updated since page load</em></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+            <pre id="editor"></pre>
+        </div>
+    </div>
+    <form id="uglify-actions">
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1">
+                <p class="bg-warning hidden" id="uglify-hash-warning">The content in the editor was too long and has been kept out the url</p>
+                <p class="bg-danger hidden" id="uglify-hash-error">Current setup could not be expressed in a url</p>
+                <button class="btn btn-warning disabled" type="button" id="uglify-compile">Compile</button>
+                <span class="btn-group">
+                    <button class="btn btn-info" type="button" id="uglify-url-store">Store in 🔗</button>
+                    <button class="btn btn-success" type="button" id="uglify-url-copy">Copy 🔗</button>
+                </span>
+                <span>
+                    <button class="btn btn-default" type="button" id="uglify-reset-settings-cancel">No! Cancel reset</button>
+                    <button class="btn btn-danger" type="button" id="uglify-reset-settings">Reset settings</button>
+                </span>
+                <button class="btn btn-default active " type="button" id="uglify-show-options">Options menu</button>
+            </div>
+        </div>
+        <div class="row" id="uglify-options">
+            <div class="col-md-2 col-md-offset-1">
+                <h4>Mangle</h4>
+                <label><input type="checkbox" checked id="opt-mangler"> Enable mangler</label><br>
+
+                <h4>Parse</h4>
+                <label><input type="checkbox" checked id="opt-html5"> Html 5 comments</label><br>
+                <label><input type="checkbox" checked id="opt-shebang"> Shebangs</label><br>
+                <label><input type="checkbox" id="opt-bare"> Bare returns</label><br>
+            </div>
+            <div class="col-md-2 col-md-offset-1">
+                <h4>Compress</h4>
+                <label><input type="checkbox" checked id="opt-compress"> Enable compression</label><br>
+                <label><input type="checkbox" checked id="opt-seq"> Sequences</label><br>
+                <label><input type="checkbox" checked id="opt-prop"> Properties</label><br>
+                <label><input type="checkbox" checked id="opt-dead-code"> Dead code</label><br>
+                <label><input type="checkbox" checked id="opt-drop-debugger"> Drop debugger</label><br>
+                <label><input type="checkbox" id="opt-unsafe"> Unsafe</label><br>
+                <label><input type="checkbox" id="opt-unsafe-comps"> Unsafe compares</label><br>
+                <label><input type="checkbox" checked id="opt-cond"> Conditionals</label><br>
+                <label><input type="checkbox" checked id="opt-comparisons"> Comparisons</label><br>
+                <label><input type="checkbox" checked id="opt-evaluate"> Evaluate</label><br>
+                <label><input type="checkbox" checked id="opt-bools"> Booleans</label><br>
+                <label><input type="checkbox" checked id="opt-loops"> Loops</label><br>
+                <label><input type="checkbox" checked id="opt-unused"> Unused</label><br>
+                <label><input type="checkbox" checked id="opt-hoist-funs"> Hoist functions</label><br>
+                <label><input type="checkbox" checked id="opt-keep-fargs"> Keep function arguments</label><br>
+                <label><input type="checkbox" id="opt-keep-fnames"> Keep function names</label><br>
+                <label><input type="checkbox" id="opt-hoist-vars"> Hoist vars</label><br>
+                <label><input type="checkbox" checked id="opt-if-return"> If return</label><br>
+                <label><input type="checkbox" checked id="opt-join-vars"> Join vars</label><br>
+                <label><input type="checkbox" id="opt-collapse-vars"> Collapse vars</label><br>
+                <label><input type="checkbox" checked id="opt-cascade"> Cascade</label><br>
+                <label><input type="checkbox" checked id="opt-side-effects"> Side effecst</label><br>
+                <label><input type="checkbox" id="opt-pure-getters"> Pure getters</label><br>
+                <label for="opt-pure-funcs" class="control-label">Pure functions</label>
+                <input type="text" class="form-control" id="opt-pure-funcs" placeholder="Functions without side effects">
+                <label><input type="checkbox" checked id="opt-negate-iife"> Negate iife</label><br>
+                <label><input type="checkbox" checked id="opt-screw-ie8"> Screw ie8</label><br>
+                <label><input type="checkbox" id="opt-drop-console"> Drop console</label><br>
+                <label><input type="checkbox" id="opt-angular"> Angular</label><br>
+                <label for="opt-globals" class="control-label">Globals</label>
+                <input type="text" class="form-control" id="opt-globals" placeholder="Globals">
+                <label for="opt-passes" class="control-label">Passes</label>
+                <input type="text" class="form-control" id="opt-passes" value="1">
+            </div>
+            <div class="col-md-2 col-md-offset-1">
+                <h4>Beautify and codegen</h4>
+                <label><input type="checkbox" id="opt-beautify"> Enable beautify</label><br>
+                <label for="opt-indent-start" class="control-label">Indent start</label>
+                <input type="text" class="form-control" id="opt-indent-start" value="0">
+                <label for="opt-indent-level" class="control-label">Indent level</label>
+                <input type="text" class="form-control" id="opt-indent-level" value="4">
+                <label><input type="checkbox" id="opt-quote-keys"> Quote keys</label><br>
+                <label><input type="checkbox" checked id="opt-space-colon"> Space colon</label><br>
+                <label><input type="checkbox" id="opt-ascii-only"> Ascii only</label><br>
+                <label><input type="checkbox" id="opt-unescape-regexps"> Unescape regexp</label><br>
+                <label><input type="checkbox" id="opt-inline-script"> Inline script</label><br>
+                <label for="opt-width" class="control-label">Width</label>
+                <input type="text" class="form-control" id="opt-width" value="80">
+                <label for="opt-max-line-len" class="control-label">Max line length</label>
+                <input type="text" class="form-control" id="opt-max-line-len" value="32000">
+                <label><input type="checkbox" id="opt-bracketize"> Bracketize</label><br>
+                <label><input type="checkbox" checked id="opt-semi"> Semicolons</label><br>
+                <label><input type="checkbox" id="opt-comments"> Comments</label><br>
+                <label><input type="checkbox" checked id="opt-shebang-out"> Shebang</label><br>
+                <label><input type="checkbox" id="opt-preserve"> Preserve line</label><br>
+                <label><input type="checkbox" checked id="opt-screw-ie8-out"> Screw ie8</label><br>
+                <label for="opt-preamble" class="control-label">Preamble</label>
+                <input type="text" class="form-control" id="opt-preamble" placeholder="Code inserted at start">
+                <label for="opt-quote-style" class="control-label">Quote style</label>
+                <input type="text" class="form-control" id="opt-quote-style" value="0">
+                <label><input type="checkbox" id="opt-keep-quoted-props"> Keep quoted properties</label><br>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1">
+                <div class="input-group">
+                    <span class="input-group-addon">Load code from url</span>
+                    <input type="text" class="form-control" id="external-url">
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" type="button" id="load-from-external-url">Fetch code</button>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+    </form>
+    <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+            <pre id="output"></pre>
+        </div>
+    </div>
+</div>

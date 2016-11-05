@@ -1,0 +1,26 @@
+{
+  "name": "uglify-editor",
+  "version": "0.1.0",
+  "description": "Editor with access to multiple uglify versions",
+  "dependencies": {
+    "grunt": "^1.0.0",
+    "grunt-contrib-cssmin": "^1.0.2",
+    "grunt-contrib-htmlmin": "^2.0.0",
+    "grunt-contrib-uglify": "^2.0.0",
+    "handlebars": "^4.0.5",
+    "mocha": "^3.1.2"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/avdg/uglify.git"
+  },
+  "author": "Anthony Van de Gejuchte",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/avdg/uglify/issues"
+  },
+  "homepage": "https://github.com/avdg/uglify#readme"
+}
