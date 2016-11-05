@@ -60,13 +60,30 @@ function cacheHash(fileName) {
 
 function getIntegrationHash(href, data) {
     data = data || {};
+    var promise;
 
-    return getFromUrl({
-        location: href,
-        etag: data.etag,
-        fileCache: __dirname + "/../build/cache/" + cacheHash(href).substr(0, 16)
-    }).then(function(res) {
-        if (typeof res.headers.etag === "string") {
+    if (/^[a-z+]*:\/\//i.test(href)) {
+        promise = getFromUrl({
+            location: href,
+            etag: data.etag,
+            fileCache: __dirname + "/../build/cache/" + cacheHash(href).substr(0, 16)
+        });
+    } else {
+        if (href[0] === "/") {
+            throw "Invalid url " + href;
+        }
+        promise = new Promise(function(done, err) {
+            fs.readFile(__dirname + "/../docs/" + href, {encoding: "utf8"}, function(fsErr, data) {
+                if (fsErr) {
+                    err(fsErr);
+                } else {
+                    done({data: data});
+                }
+            });
+        });
+    }
+    return promise.then(function(res) {
+        if (res.headers && typeof res.headers.etag === "string") {
             data.etag = res.headers.etag;
         }
         data.integrity = contentHash(res.data);

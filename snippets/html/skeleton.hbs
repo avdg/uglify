@@ -15,7 +15,7 @@
 <body>
 {{editor}}
 {{#each dependencies.scripts}}
-<script src="{{href}}" integrity="{{integrity}}" crossorigin="anonymous"{{#if async}} async{{/if}}></script>
+<script src="{{href}}" integrity="{{integrity}}" crossorigin="anonymous"{{#if async}} async{{/if}}{{#if onload}} onload="{{onload}}"{{/if}}></script>
 {{/each}}
 <script>
 {{js}}
