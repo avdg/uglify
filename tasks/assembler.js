@@ -96,33 +96,38 @@ function processDependencies(settings) {
         };
     };
 
-    var stylesheets = settings.stylesheets;
-    var scripts = settings.scripts;
+    for (var type in settings) {
+        for (var i = 0; i < settings[type].length; i++) {
+            var url;
 
-    for (var i = 0; i < stylesheets.length; i++) {
-        promises.push(getIntegrationHash(
-            stylesheets[i],
-            cache.integrity[stylesheets[i]]
-        ).then(updateData(stylesheets[i])));
+            if (typeof settings[type][i] === "string") {
+                url = settings[type][i];
+            } else {
+                url = settings[type][i].href;
+            }
+
+            promises.push(
+                getIntegrationHash(url, cache.integrity[url])
+                    .then(updateData(url))
+            );
+        }
     }
-    for (var j = 0; j < scripts.length; j++) {
-        promises.push(getIntegrationHash(
-            scripts[j],
-            cache.integrity[scripts[j]]
-        ).then(updateData(scripts[j])));
-    }
+
     return Promise.all(promises).then(function() {
         fs.writeFileSync(dependenciesFile, JSON.stringify(cache.integrity));
-        settings.stylesheets = [];
-        settings.scripts = [];
-        for (var i = 0; i < stylesheets.length; i++) {
-            cache.integrity[stylesheets[i]].href = stylesheets[i];
-            settings.stylesheets.push(cache.integrity[stylesheets[i]]);
+        for (var type in settings) {
+            for (var i = 0; i < settings[type].length; i++) {
+                var data = {};
+                if (typeof settings[type][i] === "string") {
+                    data.href = settings[type][i];
+                } else {
+                    data = settings[type][i];
+                }
+                data.integrity = cache.integrity[data.href].integrity;
+                settings[type][i] = data;
+            }
         }
-        for (var j = 0; j < scripts.length; j++) {
-            cache.integrity[scripts[j]].href = scripts[j];
-            settings.scripts.push(cache.integrity[scripts[j]]);
-        }
+
         return new Promise(function(done) {
             done(settings);
         });
