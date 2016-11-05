@@ -365,7 +365,7 @@ uedit.getUglify = function(ref, done) {
                 var uglify = {version: checkedRef, code: code};
                 var code = results.join("\n\n");
                 new Function("MOZ_SourceMap", "exports", "DEBUG", code)(
-                    {},
+                    sourceMap,
                     uglify,
                     !!window.UGLIFY_DEBUG
                 );

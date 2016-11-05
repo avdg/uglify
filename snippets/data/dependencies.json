@@ -15,8 +15,7 @@
         },
         {
             "href": "js/source-map/0.5.6/source-map.min.js",
-            "async": true,
-            "onload": "window.MOZ_SourceMap=sourceMap"
+            "async": true
         }
     ]
 }
