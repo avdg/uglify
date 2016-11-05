@@ -11,7 +11,8 @@ module.exports = function(grunt) {
         dev: {
             options: {
                 css: "snippets/css/style.css",
-                js: "snippets/js/script.js"
+                js: "snippets/js/script.js",
+                output: "docs/debug.html"
             }
         }
     },
@@ -26,8 +27,7 @@ module.exports = function(grunt) {
         postBuild: {
             options: {
                 removeComments: true,
-                collapseWhitespace: true,
-                maxLineLength: '120'
+                collapseWhitespace: true
             },
             src: 'build/html/index.html',
             dest: 'docs/index.html'
@@ -48,5 +48,6 @@ module.exports = function(grunt) {
     grunt.loadTasks('tasks');
 
     grunt.registerTask('dev', ['assembler:dev']);
-    grunt.registerTask('default', ['uglify:preBuild', 'cssmin:preBuild', 'assembler:build', 'htmlmin:postBuild']);
+    grunt.registerTask('build', ['uglify:preBuild', 'cssmin:preBuild', 'assembler:build', 'htmlmin:postBuild']);
+    grunt.registerTask('default', ['dev', 'build']);
 };
