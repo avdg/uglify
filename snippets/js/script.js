@@ -838,9 +838,11 @@ document.onload = function(){
             errors.push({
                 row: 0,
                 text: count + " UglifyJS compression warnings found.\n" +
-                    (input.length - generated.length) + " characters were removed (" +
-                    (Math.round((input.length - generated.length) / input.length * 10000) /100) +
-                    "%).",
+                    (input.length - generated.length) + " characters were removed" +
+                        (input.length === 0 ? "." : " (" + (Math.round(
+                                (input.length - generated.length) / input.length * 10000
+                            ) / 100) + "%)."
+                        ),
                 type: "info",
                 uglify: true
             });
