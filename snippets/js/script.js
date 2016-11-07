@@ -757,6 +757,16 @@ document.onload = function(){
         var editor = uedit.aceSessions.get("editor");
         var output = uedit.aceViews.get("output");
         var errors = [];
+        var defaultsErrorBackup = UglifyJS.DefaultsError.croak;
+        var stage = "Parser";
+        UglifyJS.DefaultsError.croak = function(msg, defs) {
+            errors.push({
+                row: 0,
+                text: stage + ": " + msg,
+                type: "warning",
+                uglify: true
+            });
+        };
         try {
             var options = {
                 options: {},
@@ -780,6 +790,7 @@ document.onload = function(){
             var count = 0;
 
             if (options.options.compress) {
+                stage = "Compressor";
                 if (typeof options.compress.global_defs === "string") {
                     options.compress.global_defs = options.compress.global_defs.split(",");
                 } else {
@@ -810,11 +821,13 @@ document.onload = function(){
             }
 
             if (options.options.mangle) {
+                stage = "Mangler";
                 ast.figure_out_scope();
                 ast.compute_char_frequency();
                 ast.mangle_names();
             }
 
+            stage = "Output";
             var stream = UglifyJS.OutputStream(options.codegen);
             ast.print(stream);
             var generated = stream.toString();
@@ -857,6 +870,9 @@ document.onload = function(){
             output.setValue(msg);
             throw e;
         }
+
+        // Set default error to a state like before
+        UglifyJS.DefaultsError.croak = defaultsErrorBackup;
 
         editor.setAnnotations(
             editor.getAnnotations().filter(blockUglifyAnnotation).concat(errors)
