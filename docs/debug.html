@@ -173,6 +173,8 @@
                 <label for="opt-quote-style" class="control-label">Quote style</label>
                 <input type="text" class="form-control" id="opt-quote-style" value="0">
                 <label><input type="checkbox" id="opt-keep-quoted-props"> Keep quoted properties</label><br>
+                <label for="opt-ecma" class="control-label">Ecmascript version</label>
+                <input type="text" class="form-control" id="opt-ecma" value="5">
             </div>
         </div>
         <div class="row">
@@ -786,6 +788,7 @@ document.onload = function(){
         opt_max_line_len: {type: "codegen", convertInt:!0, url: "max-line-len", uglify: "max_line_len"},
         opt_preamble:     {type: "codegen", convertInt:!1, url: "preamble",     uglify: "preamble"},
         opt_quote_style:  {type: "codegen", convertInt:!0, url: "quote_style",  uglify: "quote_style"},
+        opt_ecma:         {type: "codegen", convertInt:!0, url: "ecma",         uglify: "ecma"},
     };
     uedit.getRefs();
     cache.refCheck = setInterval(uedit.getRefsAndUpdateState, 15e4);
@@ -1000,6 +1003,9 @@ document.onload = function(){
                 options[optionsText[i].type][optionsText[i].uglify] = document.getElementById(i.replace(/_/g, "-")).value;
                 if (optionsText[i].convertInt) {
                     options[optionsText[i].type][optionsText[i].uglify] = parseInt(options[optionsText[i].type][optionsText[i].uglify]);
+                    if (options[optionsText[i].type][optionsText[i].uglify] !== options[optionsText[i].type][optionsText[i].uglify]) {
+                        options[optionsText[i].type][optionsText[i].uglify] = undefined;
+                    }
                 }
             }
 

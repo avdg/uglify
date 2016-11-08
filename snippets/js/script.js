@@ -582,6 +582,7 @@ document.onload = function(){
         opt_max_line_len: {type: "codegen", convertInt:!0, url: "max-line-len", uglify: "max_line_len"},
         opt_preamble:     {type: "codegen", convertInt:!1, url: "preamble",     uglify: "preamble"},
         opt_quote_style:  {type: "codegen", convertInt:!0, url: "quote_style",  uglify: "quote_style"},
+        opt_ecma:         {type: "codegen", convertInt:!0, url: "ecma",         uglify: "ecma"},
     };
     uedit.getRefs();
     cache.refCheck = setInterval(uedit.getRefsAndUpdateState, 15e4);
@@ -796,6 +797,9 @@ document.onload = function(){
                 options[optionsText[i].type][optionsText[i].uglify] = document.getElementById(i.replace(/_/g, "-")).value;
                 if (optionsText[i].convertInt) {
                     options[optionsText[i].type][optionsText[i].uglify] = parseInt(options[optionsText[i].type][optionsText[i].uglify]);
+                    if (options[optionsText[i].type][optionsText[i].uglify] !== options[optionsText[i].type][optionsText[i].uglify]) {
+                        options[optionsText[i].type][optionsText[i].uglify] = undefined;
+                    }
                 }
             }
 
