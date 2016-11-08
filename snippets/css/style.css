@@ -1,7 +1,11 @@
 @media (min-width: 992px) {
+    #uglify-options {
+        margin: 0 8.33333333%;
+    }
     #uglify-options div {
-        max-height: 200px;
+        height: 200px;
         overflow: auto;
+        margin-bottom: 10px;
     }
 }
 #editor, #output {

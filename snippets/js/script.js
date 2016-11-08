@@ -518,11 +518,12 @@ document.onload = function(){
     if (cache.loaded) return;
     cache.loaded = true;
     var optionsBinary = {
-        opt_html5:    {type: "parser", url: "html",    uglify: "html5_comments"},
-        opt_shebang:  {type: "parser", url: "shebang", uglify: "shebang"},
-        opt_bare:     {type: "parser", url: "bare" ,   uglify: "bare_returns"},
-        opt_compress: {type: "options", url: "compr",  uglify: "compress"},
-        opt_mangler:  {type: "options", url: "mangle", uglify: "mangle"},
+        opt_html5:             {type: "parser", url: "html",         uglify: "html5_comments"},
+        opt_shebang:           {type: "parser", url: "shebang",      uglify: "shebang"},
+        opt_bare:              {type: "parser", url: "bare" ,        uglify: "bare_returns"},
+        opt_compress:          {type: "options", url: "compr",       uglify: "compress"},
+        opt_mangler:           {type: "options", url: "mangle",      uglify: "mangle"},
+        opt_mangle_properties: {type: "options", url: "mangle-prop", uglify: "mangleProperties"},
         opt_seq:           {type: "compress", url: "seq",           uglify: "sequences"},
         opt_prop:          {type: "compress", url: "prop",          uglify: "properties"},
         opt_dead_code:     {type: "compress", url: "deadcode",      uglify: "dead_code"},
@@ -549,6 +550,11 @@ document.onload = function(){
         opt_screw_ie8:     {type: "compress", url: "screw",         uglify: "screw_ie8"},
         opt_drop_console:  {type: "compress", url: "drop-console",  uglify: "drop_console"},
         opt_angular:       {type: "compress", url: "angular",       uglify: "angular"},
+        opt_ignore_quoted: {type: "mangleProperties", url: "ignore-quoted", uglify: "ignore_quoted"},
+        opt_mangle_toplevel:    {type: "mangle", url: "mangle-toplevel",    uglify: "toplevel"},
+        opt_mangle_eval:        {type: "mangle", url: "mangle-eval",        uglify: "eval"},
+        opt_screw_ie8_mangle:   {type: "mangle", url: "screw-mangle",       uglify: "screw_ie8"},
+        opt_keep_fnames_mangle: {type: "mangle", url: "keep-fnames-mangle", uglify: "keep_fnames"},
         opt_beautify:          {type: "codegen", url: "beautify",        uglify: "beautify"},
         opt_quote_keys:        {type: "codegen", url: "quotekey",        uglify: "quote_keys"},
         opt_space_colon:       {type: "codegen", url: "spacecol",        uglify: "space_colon"},
@@ -567,6 +573,9 @@ document.onload = function(){
         opt_pure_funcs: {type: "compress", convertInt:!1, url: "pure-funcs", uglify: "pure_funcs"},
         opt_globals:    {type: "compress", convertInt:!1, url: "globals",    uglify: "global_defs"},
         opt_passes:     {type: "compress", convertInt:!0, url: "passes",     uglify: "passes"},
+        opt_reserved:   {type: "mangleProperties", convertInt: !1, url: "reserved",   uglify: "reserved"},
+        opt_prop_regex: {type: "mangleProperties", convertInt: !1, url: "prop-regex", uglify: "regex"},
+        opt_mangle_except: {type: "mangle", convertInt: !1, url: "mangle-except", uglify: "except"},
         opt_indent_start: {type: "codegen", convertInt:!0, url: "indent-start", uglify: "indent_start"},
         opt_indent_level: {type: "codegen", convertInt:!0, url: "indent-level", uglify: "indent_level"},
         opt_width:        {type: "codegen", convertInt:!0, url: "width",        uglify: "width"},
@@ -774,8 +783,12 @@ document.onload = function(){
                 compress: {
                     warnings: true
                 },
+                mangle: {},
+                mangleProperties: {},
                 codegen: {}
             };
+
+            // Collect options
             for (var i in optionsBinary) {
                 options[optionsBinary[i].type][optionsBinary[i].uglify] = document.getElementById(i.replace(/_/g, "-")).checked;
             }
@@ -785,10 +798,15 @@ document.onload = function(){
                     options[optionsText[i].type][optionsText[i].uglify] = parseInt(options[optionsText[i].type][optionsText[i].uglify]);
                 }
             }
+
+            // Get content
             var input = editor.getValue();
+
+            // Parse
             var ast = UglifyJS.parse(input, options.parser);
             var count = 0;
 
+            // Compress
             if (options.options.compress) {
                 stage = "Compressor";
                 if (typeof options.compress.global_defs === "string") {
@@ -820,13 +838,40 @@ document.onload = function(){
                 }
             }
 
-            if (options.options.mangle) {
-                stage = "Mangler";
-                ast.figure_out_scope();
-                ast.compute_char_frequency();
-                ast.mangle_names();
+            // Mangle properties
+            if (options.options.mangleProperties) {
+                if (typeof options.mangleProperties.reserved === "string") {
+                    options.mangleProperties.reserved = options.mangleProperties.reserved.split(",");
+                } else {
+                    options.mangleProperties.reserved = undefined;
+                }
+                if (options.mangleProperties.regex !== undefined) {
+                    var regex_pos = options.mangleProperties.regex.lastIndexOf("/");
+                    options.mangleProperties.regex = new RegExp(
+                        options.mangleProperties.regex.substr(1, regex_pos - 1),
+                        options.mangleProperties.regex.substr(regex_pos + 1)
+                    );
+                }
+                ast = UglifyJS.mangle_properties(ast, options.mangleProperties);
             }
 
+            // Mangle
+            if (options.options.mangle) {
+                stage = "Mangler";
+                if (typeof options.mangle.except === "string") {
+                    options.mangle.except = options.mangle.except.split(",");
+                } else {
+                    options.mangle.except = undefined;
+                }
+                ast.figure_out_scope(options.codegen);
+                ast.compute_char_frequency();
+                ast.mangle_names(options.mangle);
+
+                // Reset option before outputstreams throws us with warnings
+                delete options.codegen.cache;
+            }
+
+            // Print
             stage = "Output";
             var stream = UglifyJS.OutputStream(options.codegen);
             ast.print(stream);
@@ -876,6 +921,7 @@ document.onload = function(){
         // Set default error to a state like before
         UglifyJS.DefaultsError.croak = defaultsErrorBackup;
 
+        // Pass uglify warning to editor
         editor.setAnnotations(
             editor.getAnnotations().filter(blockUglifyAnnotation).concat(errors)
         );

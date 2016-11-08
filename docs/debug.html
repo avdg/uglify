@@ -9,9 +9,13 @@
 <title>Uglify compressor</title>
 <style>
 @media (min-width: 992px) {
+    #uglify-options {
+        margin: 0 8.33333333%;
+    }
     #uglify-options div {
-        max-height: 200px;
+        height: 200px;
         overflow: auto;
+        margin-bottom: 10px;
     }
 }
 #editor, #output {
@@ -81,16 +85,32 @@
             </div>
         </div>
         <div class="row" id="uglify-options">
-            <div class="col-md-2 col-md-offset-1">
-                <h4>Mangle</h4>
-                <label><input type="checkbox" checked id="opt-mangler"> Enable mangler</label><br>
-
+            <div class="col-md-4">
                 <h4>Parse</h4>
                 <label><input type="checkbox" checked id="opt-html5"> Html 5 comments</label><br>
                 <label><input type="checkbox" checked id="opt-shebang"> Shebangs</label><br>
                 <label><input type="checkbox" id="opt-bare"> Bare returns</label><br>
             </div>
-            <div class="col-md-2 col-md-offset-1">
+            <div class="col-md-4">
+                <h4>Mangle</h4>
+                <label><input type="checkbox" checked id="opt-mangler"> Enable mangler</label><br>
+                <label for="opt-mangle-except" class="control-label">Except</label>
+                <input type="text" class="form-control" id="opt-mangle-except" placeholder="Comma separated list">
+                <label><input type="checkbox" id="opt-mangle-toplevel"> Mangle toplevel variables</label><br>
+                <label><input type="checkbox" id="opt-mangle-eval"> Mangle in with or eval scope</label><br>
+                <label><input type="checkbox" checked id="opt-screw-ie8-mangle"> Screw ie8</label><br>
+                <label><input type="checkbox" id="opt-keep-fnames-mangle"> Keep function names</label><br>
+            </div>
+            <div class="col-md-4">
+                <h4>Mangle properties</h4>
+                <label><input type="checkbox" id="opt-mangle-properties"> Enable property mangler</label><br>
+                <label for="opt-reserved" class="control-label">Except</label>
+                <input type="text" class="form-control" id="opt-reserved" placeholder="Comma separated list">
+                <label for="opt-prop-regex" class="control-label">RegExp filter</label>
+                <input type="text" class="form-control" id="opt-prop-regex" placeholder="/RegExp/">
+                <label><input type="checkbox" id="opt-ignore-quoted"> Ignore quoted properties</label><br>
+            </div>
+            <div class="col-md-4">
                 <h4>Compress</h4>
                 <label><input type="checkbox" checked id="opt-compress"> Enable compression</label><br>
                 <label><input type="checkbox" checked id="opt-seq"> Sequences</label><br>
@@ -126,7 +146,7 @@
                 <label for="opt-passes" class="control-label">Passes</label>
                 <input type="text" class="form-control" id="opt-passes" value="1">
             </div>
-            <div class="col-md-2 col-md-offset-1">
+            <div class="col-md-4">
                 <h4>Beautify and codegen</h4>
                 <label><input type="checkbox" id="opt-beautify"> Enable beautify</label><br>
                 <label for="opt-indent-start" class="control-label">Indent start</label>
@@ -702,11 +722,12 @@ document.onload = function(){
     if (cache.loaded) return;
     cache.loaded = true;
     var optionsBinary = {
-        opt_html5:    {type: "parser", url: "html",    uglify: "html5_comments"},
-        opt_shebang:  {type: "parser", url: "shebang", uglify: "shebang"},
-        opt_bare:     {type: "parser", url: "bare" ,   uglify: "bare_returns"},
-        opt_compress: {type: "options", url: "compr",  uglify: "compress"},
-        opt_mangler:  {type: "options", url: "mangle", uglify: "mangle"},
+        opt_html5:             {type: "parser", url: "html",         uglify: "html5_comments"},
+        opt_shebang:           {type: "parser", url: "shebang",      uglify: "shebang"},
+        opt_bare:              {type: "parser", url: "bare" ,        uglify: "bare_returns"},
+        opt_compress:          {type: "options", url: "compr",       uglify: "compress"},
+        opt_mangler:           {type: "options", url: "mangle",      uglify: "mangle"},
+        opt_mangle_properties: {type: "options", url: "mangle-prop", uglify: "mangleProperties"},
         opt_seq:           {type: "compress", url: "seq",           uglify: "sequences"},
         opt_prop:          {type: "compress", url: "prop",          uglify: "properties"},
         opt_dead_code:     {type: "compress", url: "deadcode",      uglify: "dead_code"},
@@ -733,6 +754,11 @@ document.onload = function(){
         opt_screw_ie8:     {type: "compress", url: "screw",         uglify: "screw_ie8"},
         opt_drop_console:  {type: "compress", url: "drop-console",  uglify: "drop_console"},
         opt_angular:       {type: "compress", url: "angular",       uglify: "angular"},
+        opt_ignore_quoted: {type: "mangleProperties", url: "ignore-quoted", uglify: "ignore_quoted"},
+        opt_mangle_toplevel:    {type: "mangle", url: "mangle-toplevel",    uglify: "toplevel"},
+        opt_mangle_eval:        {type: "mangle", url: "mangle-eval",        uglify: "eval"},
+        opt_screw_ie8_mangle:   {type: "mangle", url: "screw-mangle",       uglify: "screw_ie8"},
+        opt_keep_fnames_mangle: {type: "mangle", url: "keep-fnames-mangle", uglify: "keep_fnames"},
         opt_beautify:          {type: "codegen", url: "beautify",        uglify: "beautify"},
         opt_quote_keys:        {type: "codegen", url: "quotekey",        uglify: "quote_keys"},
         opt_space_colon:       {type: "codegen", url: "spacecol",        uglify: "space_colon"},
@@ -751,6 +777,9 @@ document.onload = function(){
         opt_pure_funcs: {type: "compress", convertInt:!1, url: "pure-funcs", uglify: "pure_funcs"},
         opt_globals:    {type: "compress", convertInt:!1, url: "globals",    uglify: "global_defs"},
         opt_passes:     {type: "compress", convertInt:!0, url: "passes",     uglify: "passes"},
+        opt_reserved:   {type: "mangleProperties", convertInt: !1, url: "reserved",   uglify: "reserved"},
+        opt_prop_regex: {type: "mangleProperties", convertInt: !1, url: "prop-regex", uglify: "regex"},
+        opt_mangle_except: {type: "mangle", convertInt: !1, url: "mangle-except", uglify: "except"},
         opt_indent_start: {type: "codegen", convertInt:!0, url: "indent-start", uglify: "indent_start"},
         opt_indent_level: {type: "codegen", convertInt:!0, url: "indent-level", uglify: "indent_level"},
         opt_width:        {type: "codegen", convertInt:!0, url: "width",        uglify: "width"},
@@ -958,8 +987,12 @@ document.onload = function(){
                 compress: {
                     warnings: true
                 },
+                mangle: {},
+                mangleProperties: {},
                 codegen: {}
             };
+
+            // Collect options
             for (var i in optionsBinary) {
                 options[optionsBinary[i].type][optionsBinary[i].uglify] = document.getElementById(i.replace(/_/g, "-")).checked;
             }
@@ -969,10 +1002,15 @@ document.onload = function(){
                     options[optionsText[i].type][optionsText[i].uglify] = parseInt(options[optionsText[i].type][optionsText[i].uglify]);
                 }
             }
+
+            // Get content
             var input = editor.getValue();
+
+            // Parse
             var ast = UglifyJS.parse(input, options.parser);
             var count = 0;
 
+            // Compress
             if (options.options.compress) {
                 stage = "Compressor";
                 if (typeof options.compress.global_defs === "string") {
@@ -1004,13 +1042,40 @@ document.onload = function(){
                 }
             }
 
-            if (options.options.mangle) {
-                stage = "Mangler";
-                ast.figure_out_scope();
-                ast.compute_char_frequency();
-                ast.mangle_names();
+            // Mangle properties
+            if (options.options.mangleProperties) {
+                if (typeof options.mangleProperties.reserved === "string") {
+                    options.mangleProperties.reserved = options.mangleProperties.reserved.split(",");
+                } else {
+                    options.mangleProperties.reserved = undefined;
+                }
+                if (options.mangleProperties.regex !== undefined) {
+                    var regex_pos = options.mangleProperties.regex.lastIndexOf("/");
+                    options.mangleProperties.regex = new RegExp(
+                        options.mangleProperties.regex.substr(1, regex_pos - 1),
+                        options.mangleProperties.regex.substr(regex_pos + 1)
+                    );
+                }
+                ast = UglifyJS.mangle_properties(ast, options.mangleProperties);
             }
 
+            // Mangle
+            if (options.options.mangle) {
+                stage = "Mangler";
+                if (typeof options.mangle.except === "string") {
+                    options.mangle.except = options.mangle.except.split(",");
+                } else {
+                    options.mangle.except = undefined;
+                }
+                ast.figure_out_scope(options.codegen);
+                ast.compute_char_frequency();
+                ast.mangle_names(options.mangle);
+
+                // Reset option before outputstreams throws us with warnings
+                delete options.codegen.cache;
+            }
+
+            // Print
             stage = "Output";
             var stream = UglifyJS.OutputStream(options.codegen);
             ast.print(stream);
@@ -1060,6 +1125,7 @@ document.onload = function(){
         // Set default error to a state like before
         UglifyJS.DefaultsError.croak = defaultsErrorBackup;
 
+        // Pass uglify warning to editor
         editor.setAnnotations(
             editor.getAnnotations().filter(blockUglifyAnnotation).concat(errors)
         );

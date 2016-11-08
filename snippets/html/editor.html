@@ -47,16 +47,32 @@
             </div>
         </div>
         <div class="row" id="uglify-options">
-            <div class="col-md-2 col-md-offset-1">
-                <h4>Mangle</h4>
-                <label><input type="checkbox" checked id="opt-mangler"> Enable mangler</label><br>
-
+            <div class="col-md-4">
                 <h4>Parse</h4>
                 <label><input type="checkbox" checked id="opt-html5"> Html 5 comments</label><br>
                 <label><input type="checkbox" checked id="opt-shebang"> Shebangs</label><br>
                 <label><input type="checkbox" id="opt-bare"> Bare returns</label><br>
             </div>
-            <div class="col-md-2 col-md-offset-1">
+            <div class="col-md-4">
+                <h4>Mangle</h4>
+                <label><input type="checkbox" checked id="opt-mangler"> Enable mangler</label><br>
+                <label for="opt-mangle-except" class="control-label">Except</label>
+                <input type="text" class="form-control" id="opt-mangle-except" placeholder="Comma separated list">
+                <label><input type="checkbox" id="opt-mangle-toplevel"> Mangle toplevel variables</label><br>
+                <label><input type="checkbox" id="opt-mangle-eval"> Mangle in with or eval scope</label><br>
+                <label><input type="checkbox" checked id="opt-screw-ie8-mangle"> Screw ie8</label><br>
+                <label><input type="checkbox" id="opt-keep-fnames-mangle"> Keep function names</label><br>
+            </div>
+            <div class="col-md-4">
+                <h4>Mangle properties</h4>
+                <label><input type="checkbox" id="opt-mangle-properties"> Enable property mangler</label><br>
+                <label for="opt-reserved" class="control-label">Except</label>
+                <input type="text" class="form-control" id="opt-reserved" placeholder="Comma separated list">
+                <label for="opt-prop-regex" class="control-label">RegExp filter</label>
+                <input type="text" class="form-control" id="opt-prop-regex" placeholder="/RegExp/">
+                <label><input type="checkbox" id="opt-ignore-quoted"> Ignore quoted properties</label><br>
+            </div>
+            <div class="col-md-4">
                 <h4>Compress</h4>
                 <label><input type="checkbox" checked id="opt-compress"> Enable compression</label><br>
                 <label><input type="checkbox" checked id="opt-seq"> Sequences</label><br>
@@ -92,7 +108,7 @@
                 <label for="opt-passes" class="control-label">Passes</label>
                 <input type="text" class="form-control" id="opt-passes" value="1">
             </div>
-            <div class="col-md-2 col-md-offset-1">
+            <div class="col-md-4">
                 <h4>Beautify and codegen</h4>
                 <label><input type="checkbox" id="opt-beautify"> Enable beautify</label><br>
                 <label for="opt-indent-start" class="control-label">Indent start</label>
