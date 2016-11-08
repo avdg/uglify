@@ -844,6 +844,7 @@ document.onload = function(){
 
             // Mangle properties
             if (options.options.mangleProperties) {
+                stage = "Property mangler";
                 if (typeof options.mangleProperties.reserved === "string") {
                     options.mangleProperties.reserved = options.mangleProperties.reserved.split(",");
                 } else {
