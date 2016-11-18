@@ -436,17 +436,19 @@ uedit.updateState = function(result) {
     } else {
         var ref;
         if (uedit.shaRef.test(result.ref) && result.request !== result.ref) {
-            ref = '<a href="https://github.com/mishoo/UglifyJS2/tree/' + result.ref + '" target="_blank">' + result.ref.substr(0, 10) + "</a> (" + result.request + ")";
+            ref = '<a href="https://github.com/mishoo/UglifyJS2/tree/' + result.ref + '" target="_blank">' + result.ref.substr(0, 10) + "</a>";
             var tmp;
             if ((tmp = uedit.prRef.exec(result.request)) !== null && tmp[1] !== "") {
                 cache.requestRef = "PR-" + tmp[1];
+                ref += ' (<a href="https://github.com/mishoo/UglifyJS2/pull/' + tmp[1] + '" target="_blank">PR-' + tmp[1] + '</a>)';
             } else {
                 cache.requestRef = result.request;
+                ref += " (" + result.request + ")";
             }
         } else {
             ref = result.ref;
         }
-        $("#uglify-checkout-status")[0].innerHTML = "Using " + ref;
+        $("#uglify-checkout-status")[0].innerHTML = '<span class="hidden-xs">Using </span>' + ref;
         $("#uglify-compile").removeClass("disabled");
         $("#uglify-statusbar").removeClass("has-error has-warning").addClass("has-success");
     }

@@ -27,6 +27,9 @@
 #uglify-checkout-status a {
     color: inherit;
 }
+#uglify-checkout-version {
+    min-width: 50px;
+}
 .dropdown-with-updates .caret {
     color: #D6C1DD;
 }
@@ -44,7 +47,7 @@
                     <span class="input-group-addon" id="uglify-checkout-status">Loading...</span>
                     <input type="text" class="form-control" id="uglify-checkout-version" placeholder="(ref:) 572b97b master harmony v2.7.3 (pull request:) PR1234 #1234">
                     <div class="input-group-btn" id="uglify-version-change-group">
-                        <button class="btn btn-default" type="submit" id="uglify-version-change">Change version</button>
+                        <button class="btn btn-default" type="submit" id="uglify-version-change">Change<span class="hidden-xs"> version</span></button>
                         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="uglify-version-change-dropdown">
                             <span class="caret"></span>
                         </button>
@@ -642,17 +645,19 @@ uedit.updateState = function(result) {
     } else {
         var ref;
         if (uedit.shaRef.test(result.ref) && result.request !== result.ref) {
-            ref = '<a href="https://github.com/mishoo/UglifyJS2/tree/' + result.ref + '" target="_blank">' + result.ref.substr(0, 10) + "</a> (" + result.request + ")";
+            ref = '<a href="https://github.com/mishoo/UglifyJS2/tree/' + result.ref + '" target="_blank">' + result.ref.substr(0, 10) + "</a>";
             var tmp;
             if ((tmp = uedit.prRef.exec(result.request)) !== null && tmp[1] !== "") {
                 cache.requestRef = "PR-" + tmp[1];
+                ref += ' (<a href="https://github.com/mishoo/UglifyJS2/pull/' + tmp[1] + '" target="_blank">PR-' + tmp[1] + '</a>)';
             } else {
                 cache.requestRef = result.request;
+                ref += " (" + result.request + ")";
             }
         } else {
             ref = result.ref;
         }
-        $("#uglify-checkout-status")[0].innerHTML = "Using " + ref;
+        $("#uglify-checkout-status")[0].innerHTML = '<span class="hidden-xs">Using </span>' + ref;
         $("#uglify-compile").removeClass("disabled");
         $("#uglify-statusbar").removeClass("has-error has-warning").addClass("has-success");
     }
