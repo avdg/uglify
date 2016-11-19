@@ -924,6 +924,9 @@ document.onload = function(){
         state = uedit.parseUrl();
         state.editor = undefined;
         state.from = $("#external-url")[0].value;
+        if (state.from === "") {
+            return;
+        }
         editor.setReadOnly(true);
         uedit.request(state.from, function(content) {
            editor.setValue(content);
