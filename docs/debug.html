@@ -536,6 +536,16 @@ uedit.getUglify = function(ref, done) {
         var urlRef = escape(checkedRef);
 
         uedit.request(uedit.baseUrl + urlRef + "/tools/node.js", function(res) {
+            var handleRequest = function(url) {
+                return new Promise(function(success, fail) {
+                    uedit.request(url, function(file, res) {
+                        if (res.status >= 400) {
+                            fail(file);
+                        }
+                        success(file);
+                    });
+                });
+            };
             if (typeof res !== "string" || res === "" || res.status >= 400) {
                 done();
                 return;
@@ -560,19 +570,21 @@ uedit.getUglify = function(ref, done) {
                 } else {
                     throw Error("Invalid file");
                 }
-                files[i] = new Promise(function(success, fail) {
-                    uedit.request(files[i], function(file, res) {
-                        if (res.status >= 400) {
-                            fail(file);
-                        }
-                        success(file);
-                    });
-                });
+                files[i] = handleRequest(files[i]);
+            }
+
+            if (/v2\.[0-4].[0-9]+/.test(urlRef)) {
+                files.push(handleRequest(uedit.baseUrl + "v2.5.0/tools/exports.js"));
             }
 
             Promise.all(files).then(function(results) {
-                var uglify = {version: checkedRef, code: code};
                 var code = results.join("\n\n");
+
+                if (!/mangle_properties\(/.test(code)) {
+                    code = "function mangle_properties(ast) { return ast; }; // FIX make sure mangle_properties is defined\n\n" + code;
+                }
+
+                var uglify = {version: checkedRef, code: code};
                 new Function("MOZ_SourceMap", "exports", "DEBUG", code)(
                     sourceMap,
                     uglify,
@@ -981,16 +993,19 @@ document.onload = function(){
         var editor = uedit.aceSessions.get("editor");
         var output = uedit.aceViews.get("output");
         var errors = [];
-        var defaultsErrorBackup = UglifyJS.DefaultsError.croak;
         var stage = "Parser";
-        UglifyJS.DefaultsError.croak = function(msg, defs) {
-            errors.push({
-                row: 0,
-                text: stage + ": " + msg,
-                type: "warning",
-                uglify: true
-            });
-        };
+
+        if (UglifyJS.DefaultsError) {
+            var defaultsErrorBackup = UglifyJS.DefaultsError.croak;
+            UglifyJS.DefaultsError.croak = function(msg, defs) {
+                errors.push({
+                    row: 0,
+                    text: stage + ": " + msg,
+                    type: "warning",
+                    uglify: true
+                });
+            };
+        }
         try {
             var options = {
                 options: {},
@@ -1111,34 +1126,43 @@ document.onload = function(){
                 uglify: true
             });
         } catch (e) {
-            var msg = e.message;
-
-            if (e.line || e.col) {
-                msg += "\n\nAt ";
-                if (e.line) {
-                    msg += "line " + e.line + " ";
-                    errors =[{
-                        row: e.line - 1,
-                        text: "UglifyJS error: " + e.message,
-                        type: "error",
-                        uglify: true
-                    }, {
-                        row: 0,
-                        text: "UglifyJS error at line " + e.line,
-                        type: "info",
-                        uglify: true
-                    }];
-                }
-                if (e.col) msg += "col " + e.col;
+            if (e.message === undefined && typeof e.msg === "string") {
+                e.message = e.msg;
             }
 
-            output.getSession().setMode("ace/mode/text");
-            output.setValue(msg);
+            if (typeof e.message === "string") {
+                var msg = e.message;
+
+                if (e.line || e.col) {
+                    msg += "\n\nAt ";
+                    if (e.line) {
+                        msg += "line " + e.line + " ";
+                        errors =[{
+                            row: e.line - 1,
+                            text: "UglifyJS error: " + e.message,
+                            type: "error",
+                            uglify: true
+                        }, {
+                            row: 0,
+                            text: "UglifyJS error at line " + e.line,
+                            type: "info",
+                            uglify: true
+                        }];
+                    }
+                    if (e.col) msg += "col " + e.col;
+                }
+
+                output.getSession().setMode("ace/mode/text");
+                output.setValue(msg);
+            }
+
             throw e;
         }
 
         // Set default error to a state like before
-        UglifyJS.DefaultsError.croak = defaultsErrorBackup;
+        if (UglifyJS.DefaultsError) {
+            UglifyJS.DefaultsError.croak = defaultsErrorBackup;
+        }
 
         // Pass uglify warning to editor
         editor.setAnnotations(
