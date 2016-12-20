@@ -826,8 +826,8 @@ document.onload = function(){
                 var compress = { warnings: options.warnings };
                 UglifyJS.merge(compress, options.compress);
                 ast.figure_out_scope();
-                var sq = UglifyJS.Compressor(compress, options.compress);
-                ast = sq.compress(ast);
+                var sq = UglifyJS.Compressor(compress);
+                ast = ast.transform(sq);
 
                 // Pop up warning in editor
                 for (var i in sq.warnings_produced) {
