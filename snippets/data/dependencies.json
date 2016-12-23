@@ -6,9 +6,9 @@
     "scripts": [
         "https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js",
         "https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js",
-        "https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.15/clipboard.min.js",
-        "https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.5/ace.js",
-        "https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.5/ext-language_tools.js",
+        "https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.16/clipboard.min.js",
+        "https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js",
+        "https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ext-language_tools.js",
         {
             "href": "https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js",
             "async": true
