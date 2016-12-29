@@ -24,7 +24,11 @@ var uedit = {
 };
 uedit.messages = uedit.messages_en;
 uedit.messages_en.welcome =
-    "Minified code goes here after pressing the compile button\n\n" +
+    "Use this tool to test out different versions of UglifyJS2 (v2.4.5 and newer).\n\n" +
+    "This tool has access to the latest versions of UglifyJS by typing in a version\n" +
+    "in the bar on the top of the page and picks by default the latest stable version.\n\n" +
+    "# How it works\n\n" +
+    "Minified code will appear here after pressing the compile button\n\n" +
     "Shortcuts can be found on https://github.com/ajaxorg/ace/wiki/Default-Keyboard-Shortcuts\n" +
     "A nicer looking one can be found on https://duckduckgo.com/?q=ace+editor+cheat+sheet&iax=1\n\n" +
     "You can jump around between many UglifyJS2 versions by typing the reference in\n" +
