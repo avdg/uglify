@@ -23,22 +23,7 @@ var uedit = {
     notify: {}
 };
 uedit.messages = uedit.messages_en;
-uedit.messages_en.welcome =
-    "Use this tool to test out different versions of UglifyJS2 (v2.4.5 and newer).\n\n" +
-    "This tool has access to the latest versions of UglifyJS by typing in a version\n" +
-    "in the bar on the top of the page and picks by default the latest stable version.\n\n" +
-    "# How it works\n\n" +
-    "Minified code will appear here after pressing the compile button\n\n" +
-    "Shortcuts can be found on https://github.com/ajaxorg/ace/wiki/Default-Keyboard-Shortcuts\n" +
-    "A nicer looking one can be found on https://duckduckgo.com/?q=ace+editor+cheat+sheet&iax=1\n\n" +
-    "You can jump around between many UglifyJS2 versions by typing the reference in\n" +
-    "the adress bar above on the web page.\n\n" +
-    "The editor will periodically (but not live) keep track of changes on the repo.\n" +
-    "Making sure you have access to the latest version as well.\n\n" +
-    "Once an update has been detected for the current branch or pull request,\n" +
-    "it can be applied by pushing the 'Change version' button.\n\n" +
-    "For those who can't wait for updates: Updates can be forced by using the\n" +
-    "dropdown menu after the 'Change version' button.\n";
+uedit.messages_en.welcome = document.getElementById("summary").innerHTML.replace(/<br>/g, "\n");
 uedit.sort_biggest_num = function(first, second) {
     if (first.length !== second.length) {
         return first.length > second.length ? -1 : 1;
