@@ -96,7 +96,7 @@ function getIntegrationHash(href, data) {
 
 var cache = {};
 function processDependencies(settings) {
-    var dependenciesFile = "build/data/dependencies.json";
+    var dependenciesFile = "build/dependencies.json";
     var promises = [];
 
     if (cache.integrity === undefined) {
