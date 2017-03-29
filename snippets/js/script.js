@@ -23,7 +23,6 @@ var uedit = {
     notify: {}
 };
 uedit.messages = uedit.messages_en;
-uedit.messages_en.welcome = document.getElementById("summary").innerHTML.replace(/<br>/g, "\n");
 uedit.sort_biggest_num = function(first, second) {
     if (first.length !== second.length) {
         return first.length > second.length ? -1 : 1;
@@ -307,6 +306,21 @@ uedit.getRef = function(ref, done) {
         done(ref);
     }
 };
+uedit.extractFiles = function(code) {
+    var start = code.indexOf("FILES = [");
+    if (start === -1) {
+        done();
+        return;
+    }
+    var end = code.indexOf("]", start);
+    if (end === -1) {
+        done();
+        return;
+    }
+    var data = code.substring(start + 8, end + 1).replace(/,\s*\]/, "]");
+
+    return JSON.parse(data);
+};
 uedit.getUglify = function(ref, done) {
     uedit.getRef(ref, function(checkedRef) {
         if (checkedRef === undefined) {
@@ -330,17 +344,7 @@ uedit.getUglify = function(ref, done) {
                 done();
                 return;
             }
-            var start = res.indexOf("FILES = [");
-            if (start === -1) {
-                done();
-                return;
-            }
-            var end = res.indexOf("]", start);
-            if (end === -1) {
-                done();
-                return;
-            }
-            var files = JSON.parse(res.substring(start + 16, end + 1).replace(/,\s*\]/, "]"));
+            var files = uedit.extractFiles(res);
 
             for (var i = 0; i < files.length; i++) {
                 if (files[i].substr(0, 3) === "../") {
@@ -426,7 +430,9 @@ uedit.collection = function(type) {
         }
     }
 };
-uedit.aceSessions = uedit.collection(ace.EditSession);
+if (typeof ace === "object") {
+    uedit.aceSessions = uedit.collection(ace.EditSession);
+}
 uedit.aceViews = uedit.collection();
 uedit.updateState = function(result) {
     cache.requestRef = "";
@@ -517,7 +523,7 @@ uedit.showUpdatesSummary = function() {
     output.setValue(content);
     output.gotoLine(0, 0, false);
 };
-document.onload = function(){
+var loader = function(){
     if (cache.loaded) return;
     cache.loaded = true;
     var optionsBinary = {
@@ -587,6 +593,7 @@ document.onload = function(){
         opt_quote_style:  {type: "codegen", convertInt:!0, url: "quote_style",  uglify: "quote_style"},
         opt_ecma:         {type: "codegen", convertInt:!0, url: "ecma",         uglify: "ecma"},
     };
+    uedit.messages_en.welcome = document.getElementById("summary").innerHTML.replace(/<br>/g, "\n");
     uedit.getRefs();
     cache.refCheck = setInterval(uedit.getRefsAndUpdateState, 15e4);
     document.addEventListener("mousemove", function(){cache.sleep=false}, false);
@@ -1053,4 +1060,9 @@ document.onload = function(){
     _gaq.push(["_setAccount","UA-37350177-1"],["_trackPageview"]),function(){var t,e=document.createElement("script")
     e.type="text/javascript",e.async=!0,e.src=("https:"==document.location.protocol?"https://ssl":"http://www")+".google-analytics.com/ga.js",t=document.getElementsByTagName("script")[0],t.parentNode.insertBefore(e,t)}()
 };
-document.addEventListener("DOMContentLoaded", document.onload);
+
+if (typeof module === "object") {
+    module.exports = uedit;
+} else {
+    document.addEventListener("DOMContentLoaded", document.onload = loader);
+}
