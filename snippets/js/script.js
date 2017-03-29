@@ -330,7 +330,7 @@ uedit.getUglify = function(ref, done) {
                 done();
                 return;
             }
-            var start = res.indexOf("exports.FILES = [");
+            var start = res.indexOf("FILES = [");
             if (start === -1) {
                 done();
                 return;
