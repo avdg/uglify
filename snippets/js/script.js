@@ -292,6 +292,7 @@ uedit.getRef = function(ref, done) {
         ref = "PR-" + result[1];
     } else if (uedit.shaRef.test(ref)) {
         done(ref);
+        return;
     }
     if (typeof cache.versions !== "object") {
         uedit.notify.refs = function() {
@@ -1063,6 +1064,7 @@ var loader = function(){
 
 if (typeof module === "object") {
     module.exports = uedit;
+    uedit.cache = cache;
 } else {
     document.addEventListener("DOMContentLoaded", document.onload = loader);
 }
