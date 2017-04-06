@@ -462,6 +462,9 @@ uedit.updateState = function(result) {
         $("#uglify-checkout-status")[0].innerHTML = '<span class="hidden-xs">Using </span>' + ref;
         $("#uglify-compile").removeClass("disabled");
         $("#uglify-statusbar").removeClass("has-error has-warning").addClass("has-success");
+
+        $("#uglify-quick-version-change")[0].innerHTML = "Switch to " +
+            (cache.requestRef === "master" ? "harmony" : "master");
     }
     document.getElementById("uglify-url-copy").setAttribute("data-clipboard-text", location.toString());
 };
@@ -691,10 +694,10 @@ var loader = function(){
             res(items);
         }
     });
-    $("#uglify-version-change").click(function() {
+    var changeVersion = function(ref) {
         state = uedit.parseUrl();
         var oldRef = state.ref;
-        state.ref = $("#uglify-checkout-version")[0].value;
+        state.ref = ref;
         var updatedHash = updateUrl(state);
         if (location.hash !== updatedHash) {
             location.hash = updateUrl(state);
@@ -703,6 +706,14 @@ var loader = function(){
             event.initEvent("hashchange");
             window.dispatchEvent(event);
         }
+    };
+    $("#uglify-version-change").click(function() {
+        changeVersion($("#uglify-checkout-version")[0].value);
+    });
+    $("#uglify-quick-version-change").click(function() {
+        changeVersion($("#uglify-quick-version-change")[0].innerHTML === "Switch to master" ?
+            "master" : "harmony"
+        );
     });
     $("#uglify-update-refresh").click(function() {
         clearInterval(cache.refCheck);

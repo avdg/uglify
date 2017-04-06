@@ -20,6 +20,10 @@
 #uglify-checkout-version {
     min-width: 50px;
 }
+#uglify-quick-version-change {
+    color: #555;
+    background-color: #eee;
+}
 #summary {
     display: none;
 }
