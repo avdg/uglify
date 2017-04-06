@@ -310,12 +310,10 @@ uedit.getRef = function(ref, done) {
 uedit.extractFiles = function(code) {
     var start = code.indexOf("FILES = [");
     if (start === -1) {
-        done();
         return;
     }
     var end = code.indexOf("]", start);
     if (end === -1) {
-        done();
         return;
     }
     var data = code.substring(start + 8, end + 1).replace(/,\s*\]/, "]");
@@ -346,6 +344,11 @@ uedit.getUglify = function(ref, done) {
                 return;
             }
             var files = uedit.extractFiles(res);
+
+            if (files === undefined) {
+                done();
+                return;
+            }
 
             for (var i = 0; i < files.length; i++) {
                 if (files[i].substr(0, 3) === "../") {
