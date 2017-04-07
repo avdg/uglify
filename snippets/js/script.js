@@ -1070,6 +1070,7 @@ var loader = function(){
     output.setReadOnly = function(){};
 
     editor.focus();
+    editor.setValue('console.log("Paste some javascript code over here and click compile to see how it would look like minified");');
 
     window._gaq=window._gaq||[]
     _gaq.push(["_setAccount","UA-37350177-1"],["_trackPageview"]),function(){var t,e=document.createElement("script")
