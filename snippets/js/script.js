@@ -293,6 +293,9 @@ uedit.getRef = function(ref, done) {
     } else if (uedit.shaRef.test(ref)) {
         done(ref);
         return;
+    } else if (uedit.invalidRef.test(ref)) {
+        done();
+        return;
     }
     if (typeof cache.versions !== "object") {
         uedit.notify.refs = function() {
@@ -301,10 +304,8 @@ uedit.getRef = function(ref, done) {
         return;
     } else if (cache.versions[ref]) {
         done(cache.versions[ref]);
-    } else if (uedit.invalidRef.test(ref)) {
-        done();
     } else {
-        done(ref);
+        done();
     }
 };
 uedit.extractFiles = function(code) {

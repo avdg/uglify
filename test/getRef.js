@@ -23,8 +23,18 @@ describe("getFilter", function() {
             [" #1",     "abcdefg"],
             [" PR 1",   "abcdefg"],
             ["123",     "123"],
-            ["abcdef12345123456789012345678901234567890",
-             "abcdef12345123456789012345678901234567890"]
+            ["abcdef6789123456789012345678901234567890",
+             "abcdef6789123456789012345678901234567890"],
+            ["abcdef6789123456789012345678901234567890^^^^^^^^",
+             "abcdef6789123456789012345678901234567890^^^^^^^^"],
+
+            // Negative tests
+            ["abcdef123451234567890123456789012345678901",
+             undefined],
+            ["\n", undefined],
+            ["*", undefined],
+            ["1#", undefined],
+            ["1 PR", undefined]
         ];
 
         var execute = function(input, output) {
