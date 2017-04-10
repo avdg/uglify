@@ -1315,7 +1315,7 @@ var loader = function(){
     output.setReadOnly = function(){};
 
     editor.focus();
-    if (editor.getValue() === '' || true) {
+    if (editor.getValue() === '') {
         editor.setValue('console.log("1) Paste some javascript code over here");\nconsole.log("2) Press the compile button below");\nconsole.log("3) Get minified code");');
     }
 
