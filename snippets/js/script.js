@@ -531,13 +531,93 @@ uedit.showUpdatesSummary = function() {
     output.setValue(content);
     output.gotoLine(0, 0, false);
 };
+uedit.fallbackMinify = function(input, options) {
+    var ast = UglifyJS.parse(input, options.parser);
+    var count = 0;
+    var errors = [];
+
+    // Compress
+    if (options.compress) {
+        if (typeof options.compress.global_defs === "string") {
+            options.compress.global_defs = options.compress.global_defs.split(",");
+        } else {
+            options.compress.global_defs = undefined;
+        }
+        var compress = { warnings: options.warnings };
+        UglifyJS.merge(compress, options.compress);
+        ast.figure_out_scope();
+        var sq = UglifyJS.Compressor(compress);
+        ast = ast.transform(sq);
+
+        // Pop up warning in editor
+        for (var i in sq.warnings_produced) {
+            if (!uedit.nonReferingUglifyError.test(i)) {
+                continue;
+            }
+            count++;
+            var line_pos = i.lastIndexOf(":");
+            var col_pos = i.lastIndexOf(",");
+            var msg_pos = i.lastIndexOf(" [");
+            errors.push({
+                row: i.substring(line_pos + 1, col_pos) - 1,
+                text: "UglifyJS compressor: " + i.substr(0, msg_pos),
+                type: "warning",
+                uglify: true
+            });
+        }
+    }
+
+    // Mangle properties
+    if (options.mangle.mangleProperties) {
+        if (typeof options.mangleProperties.reserved === "string") {
+            options.mangleProperties.reserved = options.mangleProperties.reserved.split(",");
+        } else {
+            options.mangleProperties.reserved = undefined;
+        }
+        if (options.mangleProperties.regex !== undefined) {
+            var regex_pos = options.mangleProperties.regex.lastIndexOf("/");
+            options.mangleProperties.regex = new RegExp(
+                options.mangleProperties.regex.substr(1, regex_pos - 1),
+                options.mangleProperties.regex.substr(regex_pos + 1)
+            );
+        }
+        ast = UglifyJS.mangle_properties(ast, options.mangleProperties);
+    }
+
+    // Mangle
+    if (options.mangle) {
+        if (typeof options.mangle.except === "string") {
+            options.mangle.except = options.mangle.except.split(",");
+        } else {
+            options.mangle.except = undefined;
+        }
+        ast.figure_out_scope(options.output);
+        ast.compute_char_frequency();
+        ast.mangle_names(options.mangle);
+
+        // Reset option before outputstreams throws us with warnings
+        delete options.output.cache;
+    }
+
+    // Print
+    var stream = UglifyJS.OutputStream(options.output);
+    ast.print(stream);
+    var generated = stream.toString();
+
+    return {
+        generated: generated,
+        count: count,
+        errors: errors
+    };
+};
+
 var loader = function(){
     if (cache.loaded) return;
     cache.loaded = true;
     var optionsBinary = {
-        opt_html5:             {type: "parser", url: "html",         uglify: "html5_comments"},
-        opt_shebang:           {type: "parser", url: "shebang",      uglify: "shebang"},
-        opt_bare:              {type: "parser", url: "bare" ,        uglify: "bare_returns"},
+        opt_html5:             {type: "parse", url: "html",         uglify: "html5_comments"},
+        opt_shebang:           {type: "parse", url: "shebang",      uglify: "shebang"},
+        opt_bare:              {type: "parse", url: "bare" ,        uglify: "bare_returns"},
         opt_compress:          {type: "options", url: "compr",       uglify: "compress"},
         opt_mangler:           {type: "options", url: "mangle",      uglify: "mangle"},
         opt_mangle_properties: {type: "options", url: "mangle-prop", uglify: "mangleProperties"},
@@ -572,19 +652,19 @@ var loader = function(){
         opt_mangle_eval:        {type: "mangle", url: "mangle-eval",        uglify: "eval"},
         opt_screw_ie8_mangle:   {type: "mangle", url: "screw-mangle",       uglify: "screw_ie8"},
         opt_keep_fnames_mangle: {type: "mangle", url: "keep-fnames-mangle", uglify: "keep_fnames"},
-        opt_beautify:          {type: "codegen", url: "beautify",        uglify: "beautify"},
-        opt_quote_keys:        {type: "codegen", url: "quotekey",        uglify: "quote_keys"},
-        opt_space_colon:       {type: "codegen", url: "spacecol",        uglify: "space_colon"},
-        opt_ascii_only:        {type: "codegen", url: "ascii",           uglify: "ascii_only"},
-        opt_unescape_regexps:  {type: "codegen", url: "unescape-regexp", uglify: "unescape_regexps"},
-        opt_inline_script:     {type: "codegen", url: "inline-script",   uglify: "inline_script"},
-        opt_bracketize:        {type: "codegen", url: "bracketize",      uglify: "bracketize"},
-        opt_semi:              {type: "codegen", url: "semi",            uglify: "semicolons"},
-        opt_comments:          {type: "codegen", url: "comments",        uglify: "comments"},
-        opt_shebang_out:       {type: "codegen", url: "shebang-out",     uglify: "shebang"},
-        opt_preserve:          {type: "codegen", url: "preserve",        uglify: "preserve_line"},
-        opt_screw_ie8_out:     {type: "codegen", url: "screw-out",       uglify: "screw_ie8"},
-        opt_keep_quoted_props: {type: "codegen", url: "keep-quoteprops", uglify: "keep_quoted_props"},
+        opt_beautify:          {type: "output", url: "beautify",        uglify: "beautify"},
+        opt_quote_keys:        {type: "output", url: "quotekey",        uglify: "quote_keys"},
+        opt_space_colon:       {type: "output", url: "spacecol",        uglify: "space_colon"},
+        opt_ascii_only:        {type: "output", url: "ascii",           uglify: "ascii_only"},
+        opt_unescape_regexps:  {type: "output", url: "unescape-regexp", uglify: "unescape_regexps"},
+        opt_inline_script:     {type: "output", url: "inline-script",   uglify: "inline_script"},
+        opt_bracketize:        {type: "output", url: "bracketize",      uglify: "bracketize"},
+        opt_semi:              {type: "output", url: "semi",            uglify: "semicolons"},
+        opt_comments:          {type: "output", url: "comments",        uglify: "comments"},
+        opt_shebang_out:       {type: "output", url: "shebang-out",     uglify: "shebang"},
+        opt_preserve:          {type: "output", url: "preserve",        uglify: "preserve_line"},
+        opt_screw_ie8_out:     {type: "output", url: "screw-out",       uglify: "screw_ie8"},
+        opt_keep_quoted_props: {type: "output", url: "keep-quoteprops", uglify: "keep_quoted_props"},
     };
     var optionsText = {
         opt_pure_funcs: {type: "compress", convertInt:!1, url: "pure-funcs", uglify: "pure_funcs"},
@@ -593,13 +673,13 @@ var loader = function(){
         opt_reserved:   {type: "mangleProperties", convertInt: !1, url: "reserved",   uglify: "reserved"},
         opt_prop_regex: {type: "mangleProperties", convertInt: !1, url: "prop-regex", uglify: "regex"},
         opt_mangle_except: {type: "mangle", convertInt: !1, url: "mangle-except", uglify: "except"},
-        opt_indent_start: {type: "codegen", convertInt:!0, url: "indent-start", uglify: "indent_start"},
-        opt_indent_level: {type: "codegen", convertInt:!0, url: "indent-level", uglify: "indent_level"},
-        opt_width:        {type: "codegen", convertInt:!0, url: "width",        uglify: "width"},
-        opt_max_line_len: {type: "codegen", convertInt:!0, url: "max-line-len", uglify: "max_line_len"},
-        opt_preamble:     {type: "codegen", convertInt:!1, url: "preamble",     uglify: "preamble"},
-        opt_quote_style:  {type: "codegen", convertInt:!0, url: "quote_style",  uglify: "quote_style"},
-        opt_ecma:         {type: "codegen", convertInt:!0, url: "ecma",         uglify: "ecma"},
+        opt_indent_start: {type: "output", convertInt:!0, url: "indent-start", uglify: "indent_start"},
+        opt_indent_level: {type: "output", convertInt:!0, url: "indent-level", uglify: "indent_level"},
+        opt_width:        {type: "output", convertInt:!0, url: "width",        uglify: "width"},
+        opt_max_line_len: {type: "output", convertInt:!0, url: "max-line-len", uglify: "max_line_len"},
+        opt_preamble:     {type: "output", convertInt:!1, url: "preamble",     uglify: "preamble"},
+        opt_quote_style:  {type: "output", convertInt:!0, url: "quote_style",  uglify: "quote_style"},
+        opt_ecma:         {type: "output", convertInt:!0, url: "ecma",         uglify: "ecma"},
     };
     uedit.messages_en.welcome = document.getElementById("summary").innerHTML.replace(/<br>/g, "\n");
     uedit.getRefs();
@@ -796,14 +876,13 @@ var loader = function(){
         var editor = uedit.aceSessions.get("editor");
         var output = uedit.aceViews.get("output");
         var errors = [];
-        var stage = "Parser";
 
         if (UglifyJS.DefaultsError) {
             var defaultsErrorBackup = UglifyJS.DefaultsError.croak;
             UglifyJS.DefaultsError.croak = function(msg, defs) {
                 errors.push({
                     row: 0,
-                    text: stage + ": " + msg,
+                    text: msg,
                     type: "warning",
                     uglify: true
                 });
@@ -812,13 +891,13 @@ var loader = function(){
         try {
             var options = {
                 options: {},
-                parser: {},
+                parse: {},
                 compress: {
                     warnings: true
                 },
                 mangle: {},
                 mangleProperties: {},
-                codegen: {}
+                output: {}
             };
 
             // Collect options
@@ -835,84 +914,38 @@ var loader = function(){
                 }
             }
 
+            options.mangle.properties = options.mangleProperties;
+            if (!options.options.compress) {
+                options.compress = false;
+            }
+            if (!options.options.mangle) {
+                options.mangle = false;
+            }
+
             // Get content
             var input = editor.getValue();
-
-            // Parse
-            var ast = UglifyJS.parse(input, options.parser);
+            var result;
+            var generated;
             var count = 0;
 
-            // Compress
-            if (options.options.compress) {
-                stage = "Compressor";
-                if (typeof options.compress.global_defs === "string") {
-                    options.compress.global_defs = options.compress.global_defs.split(",");
-                } else {
-                    options.compress.global_defs = undefined;
-                }
-                var compress = { warnings: options.warnings };
-                UglifyJS.merge(compress, options.compress);
-                ast.figure_out_scope();
-                var sq = UglifyJS.Compressor(compress);
-                ast = ast.transform(sq);
-
-                // Pop up warning in editor
-                for (var i in sq.warnings_produced) {
-                    if (!uedit.nonReferingUglifyError.test(i)) {
-                        continue;
-                    }
-                    count++;
-                    var line_pos = i.lastIndexOf(":");
-                    var col_pos = i.lastIndexOf(",");
-                    var msg_pos = i.lastIndexOf(" [");
-                    errors.push({
-                        row: i.substring(line_pos + 1, col_pos) - 1,
-                        text: "UglifyJS compressor: " + i.substr(0, msg_pos),
-                        type: "warning",
-                        uglify: true
-                    });
-                }
+            if (typeof UglifyJS.minify === "function") {
+                delete options.options;
+                delete options.compress.screw_ie8;
+                delete options.compress.angular;
+                delete options.mangleProperties;
+                delete options.mangle.screw_ie8;
+                delete options.mangle.except;
+                delete options.output.screw_ie8;
+                delete options.output.ecma;
+                result = UglifyJS.minify(input, options);
+                generated = result.code;
+            } else {
+                result = uedit.fallbackMinify(input, options);
+                generated = result.generated;
+                count += result.count;
+                errors = errors.concat(result.errors);
             }
 
-            // Mangle properties
-            if (options.options.mangleProperties) {
-                stage = "Property mangler";
-                if (typeof options.mangleProperties.reserved === "string") {
-                    options.mangleProperties.reserved = options.mangleProperties.reserved.split(",");
-                } else {
-                    options.mangleProperties.reserved = undefined;
-                }
-                if (options.mangleProperties.regex !== undefined) {
-                    var regex_pos = options.mangleProperties.regex.lastIndexOf("/");
-                    options.mangleProperties.regex = new RegExp(
-                        options.mangleProperties.regex.substr(1, regex_pos - 1),
-                        options.mangleProperties.regex.substr(regex_pos + 1)
-                    );
-                }
-                ast = UglifyJS.mangle_properties(ast, options.mangleProperties);
-            }
-
-            // Mangle
-            if (options.options.mangle) {
-                stage = "Mangler";
-                if (typeof options.mangle.except === "string") {
-                    options.mangle.except = options.mangle.except.split(",");
-                } else {
-                    options.mangle.except = undefined;
-                }
-                ast.figure_out_scope(options.codegen);
-                ast.compute_char_frequency();
-                ast.mangle_names(options.mangle);
-
-                // Reset option before outputstreams throws us with warnings
-                delete options.codegen.cache;
-            }
-
-            // Print
-            stage = "Output";
-            var stream = UglifyJS.OutputStream(options.codegen);
-            ast.print(stream);
-            var generated = stream.toString();
             output.getSession().setMode("ace/mode/javascript");
             output.setValue(generated);
 
