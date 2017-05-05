@@ -239,6 +239,7 @@ dropdown menu after the 'Change version' button.<br>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.16/clipboard.min.js" integrity="sha384-RVvxof79LCL9tC4gVje4DE8jfuW3HJ1gdU60KYrw2wB4WfRUEWj7TErsKSSP/hei" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js" integrity="sha384-VnsErX2KfM7cLCRD1DEFKEJ+CnmVTjDNjZOCbxGEAkaRpyki67xRbGc9cKg4Dlm3" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ext-language_tools.js" integrity="sha384-dA6YDHSbuEkKFXgYThfYvVX2nyZKldlkRmjCWJNsfIE4Zi95Bwmim41vbGfAfHLf" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/es6-promise/4.1.0/es6-promise.auto.min.js" integrity="sha384-BiyMiUXh8TNckj6iDyXIXPZu5MJWmGX+CYQ2rsKlEolhURYTPiXszAkP/Eh+aj33" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous" async></script>
 <script src="js/source-map/0.5.6/source-map.min.js" integrity="sha384-stNdDK6w5OXBPqpgl/6tbXF72nvnIwVhG6rdUGBSznsDMIInFuuWRoQqH8HhoGGr" crossorigin="anonymous" async></script>
 <script>
@@ -1175,7 +1176,7 @@ var loader = function(){
             if (typeof UglifyJS.minify === "function") {
                 options.compress.ie8 = options.compress.screw_ie8;
                 options.mangle.ie8 = options.mangle.screw_ie8;
-                options.output.ie8 = optionoutputss.screw_ie8;
+                options.output.ie8 = options.output.screw_ie8;
                 delete options.options;
                 delete options.compress.screw_ie8;
                 delete options.compress.angular;

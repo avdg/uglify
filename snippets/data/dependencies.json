@@ -9,6 +9,7 @@
         "https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.16/clipboard.min.js",
         "https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js",
         "https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ext-language_tools.js",
+        "https://cdnjs.cloudflare.com/ajax/libs/es6-promise/4.1.0/es6-promise.auto.min.js",
         {
             "href": "https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js",
             "async": true

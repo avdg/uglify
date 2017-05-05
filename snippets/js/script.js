@@ -931,7 +931,7 @@ var loader = function(){
             if (typeof UglifyJS.minify === "function") {
                 options.compress.ie8 = options.compress.screw_ie8;
                 options.mangle.ie8 = options.mangle.screw_ie8;
-                options.output.ie8 = optionoutputss.screw_ie8;
+                options.output.ie8 = options.output.screw_ie8;
                 delete options.options;
                 delete options.compress.screw_ie8;
                 delete options.compress.angular;
