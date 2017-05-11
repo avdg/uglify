@@ -941,7 +941,12 @@ var loader = function(){
                 delete options.output.screw_ie8;
                 delete options.output.ecma;
                 result = UglifyJS.minify(input, options);
-                generated = result.code;
+
+                if (result.error) {
+                    throw result.error;
+                }
+
+                generated = result.code ;
             } else {
                 result = uedit.fallbackMinify(input, options);
                 generated = result.generated;
