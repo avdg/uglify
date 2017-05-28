@@ -940,6 +940,8 @@ var loader = function(){
                 delete options.mangle.except;
                 delete options.output.screw_ie8;
                 delete options.output.ecma;
+                delete options.output.space_colon;
+                delete options.output.unescape_regexps;
                 result = UglifyJS.minify(input, options);
 
                 if (result.error) {
