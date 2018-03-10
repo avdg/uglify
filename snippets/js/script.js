@@ -54,7 +54,7 @@ uedit.sortRefsByQuery = function(query) {
             points[a] = Math.max(0, points[a] - 1);
         }
         return points[a];
-    }
+    };
     return function(a, b) {
         score_a = score(a);
         score_b = score(b);
@@ -300,7 +300,7 @@ uedit.getRef = function(ref, done) {
     if (typeof cache.versions !== "object") {
         uedit.notify.refs = function() {
             uedit.getRef(ref, done);
-        }
+        };
         return;
     } else if (cache.versions[ref]) {
         done(cache.versions[ref]);
@@ -684,8 +684,8 @@ var loader = function(){
     uedit.messages_en.welcome = document.getElementById("summary").innerHTML.replace(/<br>/g, "\n");
     uedit.getRefs();
     cache.refCheck = setInterval(uedit.getRefsAndUpdateState, 15e4);
-    document.addEventListener("mousemove", function(){cache.sleep=false}, false);
-    document.addEventListener("keydown", function(){cache.sleep=false}, false)
+    document.addEventListener("mousemove", function(){cache.sleep=false;}, false);
+    document.addEventListener("keydown", function(){cache.sleep=false;}, false);
     var state = uedit.parseUrl();
     var clipboardCopyUrl;
     var hideResetCancel = function() {
@@ -717,7 +717,7 @@ var loader = function(){
         }
 
         return hash;
-    }
+    };
 
     var storeInHash = function() {
         state = uedit.parseUrl();
@@ -738,14 +738,14 @@ var loader = function(){
             element = document.getElementById(i.replace(/_/g, "-"));
             if (element.value !== element.defaultValue) {
                 if (state.set !== "") {
-                    state.set += "z"
+                    state.set += "z";
                 }
                 state.set += optionsText[i].url + "\t" + ("" + element.value).replace(/\z/g, "zz");
             }
         }
         var hash = updateUrl(state);
         location.hash = hash;
-    }
+    };
     var searchBox = $("#uglify-checkout-version");
     searchBox[0].value = state.ref || "master";
     cache.versions_info = cache.versions_info || {};
@@ -849,7 +849,7 @@ var loader = function(){
             if (c.concat) {
                 c.parts[c.parts.length - 1] += decoded;
             } else {
-                c.parts.push(decoded)
+                c.parts.push(decoded);
             }
             var pos = a.length - 1;
             for(;a[pos] === "z";pos--){}
@@ -1035,7 +1035,7 @@ var loader = function(){
         while ((timer = doResetTimers.pop()) !== undefined) {
             window.clearTimeout(timer);
         }
-    }
+    };
     $("#uglify-reset-settings").click(function() {
         var self = this;
         if (!doReset) {
@@ -1114,13 +1114,13 @@ var loader = function(){
     output.setReadOnly = function(){};
 
     editor.focus();
-    if (editor.getValue() === '') {
+    if ('' === editor.getValue()) {
         editor.setValue('console.log("1) Paste some javascript code over here");\nconsole.log("2) Press the compile button below");\nconsole.log("3) Get minified code");');
     }
 
-    window._gaq=window._gaq||[]
-    _gaq.push(["_setAccount","UA-37350177-1"],["_trackPageview"]),function(){var t,e=document.createElement("script")
-    e.type="text/javascript",e.async=!0,e.src=("https:"==document.location.protocol?"https://ssl":"http://www")+".google-analytics.com/ga.js",t=document.getElementsByTagName("script")[0],t.parentNode.insertBefore(e,t)}()
+    window._gaq=window._gaq||[];
+    _gaq.push(["_setAccount","UA-37350177-1"],["_trackPageview"]),function(){var t,e=document.createElement("script");
+    e.type="text/javascript",e.async=!0,e.src=("https:"==document.location.protocol?"https://ssl":"http://www")+".google-analytics.com/ga.js",t=document.getElementsByTagName("script")[0],t.parentNode.insertBefore(e,t)}();
 };
 
 if (typeof module === "object") {
